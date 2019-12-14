@@ -1,8 +1,14 @@
 import React from "react";
+import { Route } from 'react-router-dom';
+import { AdminPage, AuthPage} from '../routes'
+
 
 const Root = () => {
   return (
-    <div>Root component</div>
+    <div>
+      <Route path="/admin" component={AdminPage}/>
+      <Route path="/auth" component={AuthPage}/>
+    </div>
   );
 };
 
