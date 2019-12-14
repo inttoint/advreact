@@ -1,11 +1,12 @@
 import React from "react";
 import { reduxForm, Field } from 'redux-form';
 
-const SignInForm = () => {
+const SignInForm = (props) => {
+  const { handleSubmit } = props;
   return (
     <div>
       <h2>Sign In</h2>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email</label>
           <Field name="email" component="input" />

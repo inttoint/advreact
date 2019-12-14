@@ -1,3 +1,7 @@
 import SignInForm from "./sign-in-form";
+import SignUpForm from './sign-up-form';
 
-export default SignInForm;
+export {
+  SignInForm,
+  SignUpForm
+};
