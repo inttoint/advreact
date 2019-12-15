@@ -1,7 +1,7 @@
 import React from "react";
 import { reduxForm, Field } from 'redux-form';
 import emailValidator from 'email-validator';
-import ErrorField from "./error-field";
+import ErrorField from "./ErrorField";
 
 const SignUpForm = (props) => {
   const { handleSubmit } = props;

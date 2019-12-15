@@ -1,6 +1,7 @@
 import React from "react";
 import { Route } from 'react-router-dom';
-import { AdminPage, AuthPage} from '../routes'
+import AdminPage from "./routes/AdminPage";
+import AuthPage from "./routes/AuthPage";
 
 
 const Root = () => {
