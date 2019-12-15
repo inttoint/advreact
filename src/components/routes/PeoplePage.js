@@ -1,13 +1,16 @@
 import React, { Component } from "react";
+import AddPersonForm from "../people/AddPersonForm";
 
 class PeoplePage extends Component {
   render() {
     return (
       <div>
-        <h2>People Page</h2>
+        <AddPersonForm onSubmit={this.handleAddedPerson} />
       </div>
     );
   }
+
+  handleAddedPerson = (values) => console.log("---", values);
 }
 
 export default PeoplePage;
