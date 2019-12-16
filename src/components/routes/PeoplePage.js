@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import AddPersonForm from "../people/AddPersonForm";
+import { connect } from 'react-redux';
+import { addPerson } from '../../ducks/people';
 
 class PeoplePage extends Component {
   render() {
@@ -10,7 +12,7 @@ class PeoplePage extends Component {
     );
   }
 
-  handleAddedPerson = (values) => console.log("---", values);
+  handleAddedPerson = ({ firstName, lastName, email }) => this.props.addPerson(firstName, lastName, email);
 }
 
-export default PeoplePage;
+export default connect(null, {addPerson})(PeoplePage);
