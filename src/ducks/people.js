@@ -1,7 +1,7 @@
 import { appName } from  '../config';
 import { List, Record} from 'immutable';
 import { generateId } from "./utils";
-import { put, takeEvery } from 'redux-saga/effects';
+import { put, call, takeEvery } from 'redux-saga/effects';
 
 const ReducerState = Record({
   entities: List()
@@ -54,7 +54,7 @@ export function addPerson(person) {
 }
 
 const addPersonSaga = function * (action) {
-  const id = generateId();
+  const id = yield call(generateId);
   yield put({
     type: ADD_PERSON,
     payload: {
