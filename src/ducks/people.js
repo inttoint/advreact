@@ -1,5 +1,7 @@
 import { appName } from  '../config';
 import { List, Record} from 'immutable';
+import { generateId } from "./utils";
+import { put, takeEvery } from 'redux-saga/effects';
 
 const ReducerState = Record({
   entities: List()
@@ -15,6 +17,7 @@ const PersonRecord = Record({
 export const moduleName = 'people';
 export const prefix = `${appName}/${moduleName}`;
 export const ADD_PERSON = `${prefix}/ADD_PERSON`;
+export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
@@ -29,16 +32,37 @@ export default function reducer(state = new ReducerState(), action) {
   }
 }
 
+// export function addPerson(person) {
+//   return (dispatch) => {
+//     dispatch({
+//       type: ADD_PERSON,
+//       payload: {
+//         person: {
+//           id: Date.now(),
+//           ...person
+//         }
+//       }
+//     });
+//   };
+// }
+
 export function addPerson(person) {
-  return (dispatch) => {
-    dispatch({
-      type: ADD_PERSON,
-      payload: {
-        person: {
-          id: Date.now(),
-          ...person
-        }
-      }
-    });
-  };
+  return {
+    type: ADD_PERSON_REQUEST,
+    payload: person
+  }
 }
+
+const addPersonSaga = function * (action) {
+  const id = generateId();
+  yield put({
+    type: ADD_PERSON,
+    payload: {
+      person: { id, ...action.payload }
+    }
+  });
+};
+
+export const saga = function * () {
+  yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga);
+};
