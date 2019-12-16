@@ -3,11 +3,11 @@ import { Field, reduxForm } from "redux-form";
 import emailValidator from 'email-validator';
 import ErrorField from "../common/ErrorField";
 
-const AddPersonForm = (props) => {
+const NewPersonForm = (props) => {
   const { handleSubmit } = props;
   return (
     <div>
-      <h2>Add person</h2>
+      <h2>Add new person</h2>
       <form onSubmit={handleSubmit}>
         <Field name="firstName" component={ErrorField} />
         <Field name="lastName" component={ErrorField} />
@@ -20,20 +20,19 @@ const AddPersonForm = (props) => {
   );
 };
 
-const validate = ({ firstName, lastName, email }) => {
+const validate = ({ firstName, email }) => {
   const errors = {};
 
   if (!firstName) errors.firstName = 'First name is required';
-  if (!lastName) errors.lastName = 'Last name is required';
 
   if (!email) errors.email = 'Email is required';
-  else if (!emailValidator.validate(email)) errors.email= 'Invalid email';
+  else if (!emailValidator.validate(email)) errors.email= 'Email is invalid';
 
   return errors;
 
 };
 
 export default reduxForm({
-  form: 'addPerson',
+  form: 'newPerson',
   validate
-})(AddPersonForm);
+})(NewPersonForm);

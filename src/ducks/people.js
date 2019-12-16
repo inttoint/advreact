@@ -1,44 +1,44 @@
 import { appName } from  '../config';
-import { List, Record, Map} from 'immutable';
+import { List, Record} from 'immutable';
 
-const ReducerRecord = Record({
-  userList: List(),
-  error: null,
-  loading: null
+const ReducerState = Record({
+  entities: List()
+});
+
+const PersonRecord = Record({
+  id: null,
+  firstName: null,
+  lastName: null,
+  email: null
 });
 
 export const moduleName = 'people';
-export const ADD_PERSON_REQUEST = `${appName}/${moduleName}/ADD_PERSON_REQUEST`;
-export const ADD_PERSON_SUCCESS = `${appName}/${moduleName}/ADD_PERSON_SUCCESS`;
-export const ADD_PERSON_ERROR = `${appName}/${moduleName}/ADD_PERSON_ERROR`;
+export const prefix = `${appName}/${moduleName}`;
+export const ADD_PERSON = `${prefix}/ADD_PERSON`;
 
-export default function reducer(state = new ReducerRecord(), action) {
-  const { type, payload, error } = action;
+export default function reducer(state = new ReducerState(), action) {
+  const { type, payload } = action;
 
   switch (type) {
-    case ADD_PERSON_REQUEST:
-      return state.set('loading', true);
+    case ADD_PERSON:
+      const person = new PersonRecord(payload.person);
+      return state.update('entities', entities => entities.push(person));
 
-    case ADD_PERSON_SUCCESS:
-      const user = new Map({...payload});
-      return state
-        .set('loading', false)
-        .set('error', null)
-        .update('userList', list => list.push(user));
-
-    case ADD_PERSON_ERROR:
-      return state
-        .set('loading', false)
-        .set('error', error);
     default:
       return state;
   }
 }
 
-export function addPerson(firstName, lastName, email) {
-  return {
-      type: ADD_PERSON_SUCCESS,
-      payload: { firstName, lastName, email }
-
+export function addPerson(person) {
+  return (dispatch) => {
+    dispatch({
+      type: ADD_PERSON,
+      payload: {
+        person: {
+          id: Date.now(),
+          ...person
+        }
+      }
+    });
   };
 }

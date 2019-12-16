@@ -3,7 +3,7 @@ import { Route } from 'react-router-dom';
 import AdminPage from "./routes/AdminPage";
 import AuthPage from "./routes/AuthPage";
 import ProtectedRoute from "./common/ProtectedRoute";
-import PeoplePage from "./routes/PeoplePage";
+import PeoplePage from "./routes/PersonPage";
 
 
 const Root = () => {
