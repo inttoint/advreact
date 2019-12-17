@@ -25,4 +25,4 @@ const Root = (props) => {
 
 export default connect(state => ({
   signedIn: !!state[moduleName].user
-}), { signOut })(Root);
+}), { signOut }, null, {pure: false})(Root);
