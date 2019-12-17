@@ -32,20 +32,6 @@ export default function reducer(state = new ReducerState(), action) {
   }
 }
 
-// export function addPerson(person) {
-//   return (dispatch) => {
-//     dispatch({
-//       type: ADD_PERSON,
-//       payload: {
-//         person: {
-//           id: Date.now(),
-//           ...person
-//         }
-//       }
-//     });
-//   };
-// }
-
 export function addPerson(person) {
   return {
     type: ADD_PERSON_REQUEST,
@@ -53,7 +39,7 @@ export function addPerson(person) {
   }
 }
 
-const addPersonSaga = function * (action) {
+export const addPersonSaga = function * (action) {
   const id = yield call(generateId);
   yield put({
     type: ADD_PERSON,
