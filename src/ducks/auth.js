@@ -1,7 +1,7 @@
 import firebase from 'firebase';
 import { appName } from '../config';
 import { Record } from 'immutable';
-import { all, call, take, put } from 'redux-saga/effects';
+import { all, call, take, put, cps } from 'redux-saga/effects';
 
 const ReducerRecord = Record({
   user: null,
@@ -13,6 +13,7 @@ export const moduleName = 'auth';
 export const SIGN_UP_REQUEST = `${appName}/${moduleName}/SIGN_UP_REQUEST`;
 export const SIGN_UP_SUCCESS = `${appName}/${moduleName}/SIGN_UP_SUCCESS`;
 export const SIGN_UP_ERROR = `${appName}/${moduleName}/SIGN_UP_ERROR`;
+export const SIGN_IN_SUCCESS = `${appName}/${moduleName}/SIGN_IN_SUCCESS`;
 
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -65,26 +66,23 @@ export function* signUpSaga() {
   }
 }
 
-// export function signUp(email, password) {
-//   return (dispatch) => {
-//     dispatch({
-//       type: SIGN_UP_REQUEST
-//     });
-//     firebase.auth().createUserWithEmailAndPassword(email, password)
-//       .then(user => dispatch({
-//         type:SIGN_UP_SUCCESS,
-//         payload: user
-//       }))
-//       .catch(error => dispatch({
-//         type: SIGN_UP_ERROR,
-//         error
-//       }));
-//   };
-// }
+export const watchStatusChange = function * () {
+const auth = firebase.auth();
+
+try {
+  yield cps([auth, auth.onAuthStateChanged]);
+} catch (user) {
+  yield put({
+    type: SIGN_IN_SUCCESS,
+    payload: { user }
+  });
+}
+};
 
 export const saga = function * () {
   yield all([
-    signUpSaga()
+    signUpSaga(),
+    watchStatusChange()
   ]);
 };
 
