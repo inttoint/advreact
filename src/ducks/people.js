@@ -2,6 +2,7 @@ import { appName } from  '../config';
 import { List, Record} from 'immutable';
 import { generateId } from "./utils";
 import { put, call, takeEvery } from 'redux-saga/effects';
+import { reset } from 'redux-form';
 
 const ReducerState = Record({
   entities: List()
@@ -47,6 +48,7 @@ export const addPersonSaga = function * (action) {
       person: { id, ...action.payload }
     }
   });
+  yield put(reset('newPerson')); /* ToDo: Вынести название формы */
 };
 
 export const saga = function * () {
