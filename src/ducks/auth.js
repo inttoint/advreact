@@ -6,7 +6,7 @@ import { push } from 'connected-react-router';
 
 const firebaseAuth = firebase.auth();
 
-const ReducerRecord = Record({
+export const ReducerRecord = Record({
   user: null,
   error: null,
   loading: false

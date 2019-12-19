@@ -7,7 +7,7 @@ it ('should dispatch person with generated id', () => {
     firstName: 'Tester',
     lastName: 'Testerov',
     email: 'test@test.test'
-  }
+  };
 
   const saga = addPersonSaga({
     type: ADD_PERSON_REQUEST,
