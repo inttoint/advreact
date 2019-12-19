@@ -1,5 +1,8 @@
 import { appName } from  '../config';
 import { List, Record} from 'immutable';
+import { generateId } from "./utils";
+import { put, call, takeEvery } from 'redux-saga/effects';
+import { reset } from 'redux-form';
 
 const ReducerState = Record({
   entities: List()
@@ -15,6 +18,7 @@ const PersonRecord = Record({
 export const moduleName = 'people';
 export const prefix = `${appName}/${moduleName}`;
 export const ADD_PERSON = `${prefix}/ADD_PERSON`;
+export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
@@ -30,15 +34,23 @@ export default function reducer(state = new ReducerState(), action) {
 }
 
 export function addPerson(person) {
-  return (dispatch) => {
-    dispatch({
-      type: ADD_PERSON,
-      payload: {
-        person: {
-          id: Date.now(),
-          ...person
-        }
-      }
-    });
-  };
+  return {
+    type: ADD_PERSON_REQUEST,
+    payload: person
+  }
 }
+
+export const addPersonSaga = function * (action) {
+  const id = yield call(generateId);
+  yield put({
+    type: ADD_PERSON,
+    payload: {
+      person: { id, ...action.payload }
+    }
+  });
+  yield put(reset('newPerson')); /* ToDo: Вынести название формы */
+};
+
+export const saga = function * () {
+  yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga);
+};
