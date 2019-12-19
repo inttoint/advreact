@@ -75,8 +75,9 @@ export function signOut() {
 export function * signInSaga () {
 
   while (true) {
-    const {payload: {email, password}} = yield take(SIGN_IN_REQUEST);
     try {
+      const {payload: {email, password}} = yield take(SIGN_IN_REQUEST);
+
       const user = yield call([firebaseAuth, firebaseAuth.signInWithEmailAndPassword], email, password);
       yield put({
         type: SIGN_IN_SUCCESS,
@@ -96,12 +97,12 @@ export function * signInSaga () {
 
 export function * signUpSaga() {
   while (true) {
-    const {payload: {email, password}} = yield take(SIGN_UP_REQUEST);
-
     try {
+      const {payload: {email, password}} = yield take(SIGN_UP_REQUEST);
+
       const user = yield call([firebaseAuth, firebaseAuth.createUserWithEmailAndPassword], email, password);
       yield put({
-        type: SIGN_IN_SUCCESS,
+        type: SIGN_UP_SUCCESS,
         payload: user
       });
       yield put(push('/admin'))
