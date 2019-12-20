@@ -11,16 +11,23 @@ export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`;
 
 
 export const ReducerRecord = new Record({
-  entities: new OrderedMap()
+  entities: new OrderedMap(),
+  loading: false,
+  loaded: false
 });
 
 export default function reducer(state = new ReducerRecord(), action) {
-  const { type } = action;
+  const { type, payload } = action;
 
   switch (type) {
+    case FETCH_ALL_REQUEST:
+      return state.set('loading', true);
 
     default:
-      return state;
+      return state
+        .set('loading', false)
+        .set('loaded', true)
+        .set('entities', new OrderedMap(payload));
   }
 }
 
