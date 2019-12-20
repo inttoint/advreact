@@ -4,6 +4,7 @@ import AdminPage from "./routes/AdminPage";
 import AuthPage from "./routes/AuthPage";
 import ProtectedRoute from "./common/ProtectedRoute";
 import PersonPage from "./routes/PersonPage";
+import EventsPage from "./routes/EventsPage";
 import { connect } from "react-redux";
 import { moduleName, signOut } from  '../ducks/auth'
 
@@ -19,6 +20,7 @@ const Root = (props) => {
       <ProtectedRoute path="/admin" component={AdminPage}/>
       <Route path="/auth" component={AuthPage}/>
       <Route path="/people" component={PersonPage} />
+      <Route path="/events" component={EventsPage} />
     </div>
   );
 };
