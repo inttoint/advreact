@@ -3,6 +3,7 @@ import { OrderedMap, Record } from "immutable";
 import { all, take, call, put } from 'redux-saga/effects';
 import firebase from "firebase";
 import { fbDataToEntities } from "./utils";
+import { createSelector } from 'reselect';
 
 
 export const moduleName = 'events';
@@ -43,6 +44,12 @@ export default function reducer(state = new ReducerRecord(), action) {
       return state;
   }
 }
+
+export const stateSelector = state => state[moduleName];
+export const entitiesSelector = createSelector(stateSelector, state => state.entities);
+export const eventListSelector = createSelector(entitiesSelector, entities => (
+  entities.valueSeq().toArray()
+));
 
 export function fetchAll() {
   return {

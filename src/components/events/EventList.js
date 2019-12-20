@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { moduleName, fetchAll } from "../../ducks/events";
+import { eventListSelector, fetchAll } from "../../ducks/events";
 
 class EventList extends Component {
 
@@ -17,5 +17,5 @@ class EventList extends Component {
 }
 
 export default connect(state => ({
-  events: state[moduleName].entities
+  events: eventListSelector(state)
 }), { fetchAll })(EventList);
