@@ -2,6 +2,7 @@ import { appName } from "../config";
 import { OrderedMap, Record } from "immutable";
 import { all, take, call, put } from 'redux-saga/effects';
 import firebase from "firebase";
+import { fbDataToEntities } from "./utils";
 
 
 export const moduleName = 'events';
@@ -16,18 +17,30 @@ export const ReducerRecord = new Record({
   loaded: false
 });
 
+export const EventRecord = new Record({
+  uid: null,
+  title: null,
+  url: null,
+  where: null,
+  when: null,
+  month: null,
+  submissionDeadline: null
+});
+
 export default function reducer(state = new ReducerRecord(), action) {
   const { type, payload } = action;
 
   switch (type) {
     case FETCH_ALL_REQUEST:
       return state.set('loading', true);
-
-    default:
+    case FETCH_ALL_SUCCESS:
       return state
         .set('loading', false)
         .set('loaded', true)
-        .set('entities', new OrderedMap(payload));
+        .set('entities', fbDataToEntities(payload, EventRecord));
+
+    default:
+      return state;
   }
 }
 
