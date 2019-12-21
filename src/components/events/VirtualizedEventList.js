@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { eventListSelector, moduleName, fetchLazy, selectEvent } from "../../ducks/events";
-import Loader from '../common/Loader';
 import { Table, Column, InfiniteLoader } from 'react-virtualized';
 import 'react-virtualized/styles.css'
 
@@ -12,15 +11,13 @@ export class EventList extends Component {
   }
 
   render() {
-    const { events } = this.props;
-
-    // if (loading) return <Loader />;
+    const { loaded, events } = this.props;
 
     return (
       <InfiniteLoader
         loadMoreRows={this.loadMoreRows}
         isRowLoaded={this.isRowLoaded}
-        rowCount={events.length + 1}
+        rowCount={loaded ? events.length : events.length + 1}
       >
         {({ onRowsRendered, registerChild }) =>
           <Table
