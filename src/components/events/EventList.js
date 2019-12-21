@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { eventListSelector, moduleName, fetchAll } from "../../ducks/events";
 import Loader from '../common/Loader'
 
-class EventList extends Component {
+export class EventList extends Component {
 
   componentDidMount() {
     this.props.fetchAll();
