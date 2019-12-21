@@ -3,9 +3,12 @@ import { List, Record} from 'immutable';
 import { generateId } from "./utils";
 import { put, call, takeEvery } from 'redux-saga/effects';
 import { reset } from 'redux-form';
+import firebase from "firebase";
 
 const ReducerState = Record({
-  entities: List()
+  entities: List(),
+  loading: false,
+  loaded: false
 });
 
 const PersonRecord = Record({
@@ -17,16 +20,21 @@ const PersonRecord = Record({
 
 export const moduleName = 'people';
 export const prefix = `${appName}/${moduleName}`;
-export const ADD_PERSON = `${prefix}/ADD_PERSON`;
 export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
+export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
 
   switch (type) {
-    case ADD_PERSON:
+    case ADD_PERSON_REQUEST:
+      return state.set('loading', true);
+
+    case ADD_PERSON_SUCCESS:
       const person = new PersonRecord(payload.person);
-      return state.update('entities', entities => entities.push(person));
+      return state
+        .set('loading', false)
+        .update('entities', entities => entities.push(person));
 
     default:
       return state;
@@ -42,8 +50,12 @@ export function addPerson(person) {
 
 export const addPersonSaga = function * (action) {
   const id = yield call(generateId);
+
+  const ref = firebase.database().ref('people');
+  yield call([ref, ref.push], action.payload);
+
   yield put({
-    type: ADD_PERSON,
+    type: ADD_PERSON_SUCCESS,
     payload: {
       person: { id, ...action.payload }
     }
