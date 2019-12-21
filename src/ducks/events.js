@@ -50,7 +50,8 @@ export default function reducer(state = new ReducerRecord(), action) {
     case FETCH_LAZY_SUCCESS:
       return state
         .set('loading', false)
-        .mergeIn(['entities'], fbDataToEntities(payload, EventRecord));
+        .mergeIn(['entities'], fbDataToEntities(payload, EventRecord))
+        .set('loaded', Object.keys(payload).length < 10);
 
     case SELECT_EVENT:
       return state.selected.contains(payload.uid)
@@ -101,7 +102,7 @@ export const fetchLazySaga = function * () {
     yield take(FETCH_LAZY_REQUEST);
     const state = yield select(stateSelector);
 
-    if (state.loading) continue;
+    if (state.loading || state.loaded) continue;
 
     yield put({ type: FETCH_LAZY_START });
 
