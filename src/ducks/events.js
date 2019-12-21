@@ -1,5 +1,5 @@
 import { appName } from "../config";
-import { OrderedMap, Record } from "immutable";
+import { OrderedMap, OrderedSet, Record } from "immutable";
 import { all, take, call, put } from 'redux-saga/effects';
 import firebase from "firebase";
 import { fbDataToEntities } from "./utils";
@@ -10,10 +10,12 @@ export const moduleName = 'events';
 const prefix = `${appName}/${moduleName}`;
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`;
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`;
+export const SELECT_EVENT = `${prefix}/SELECT_EVENT`;
 
 
 export const ReducerRecord = new Record({
-  entities: new OrderedMap(),
+  entities: new OrderedMap({}),
+  selected: new OrderedSet([]),
   loading: false,
   loaded: false
 });
@@ -39,6 +41,10 @@ export default function reducer(state = new ReducerRecord(), action) {
         .set('loading', false)
         .set('loaded', true)
         .set('entities', fbDataToEntities(payload, EventRecord));
+    case SELECT_EVENT:
+      return state.selected.contains(payload.uid)
+        ? state.update('selected', selected => selected.remove(payload.uid))
+        : state.update('selected', selected => selected.add(payload.uid));
 
     default:
       return state;
@@ -55,6 +61,13 @@ export function fetchAll() {
   return {
     type: FETCH_ALL_REQUEST
   };
+}
+
+export function selectEvent(uid) {
+  return {
+    type: SELECT_EVENT,
+    payload: { uid }
+  }
 }
 
 export const fetchAllSaga = function * () {
