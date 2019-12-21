@@ -21,6 +21,7 @@ export class EventList extends Component {
         rowCount={events.length}
         rowGetter={this.rowGetter}
         overscanRowCount={5}
+        onRowClick={this.handleRowClick}
         rowHeight={40}
         headerHeight={50}
         width={700}
@@ -50,22 +51,9 @@ export class EventList extends Component {
     return this.props.events.map(this.getRow);
   }
 
-  getRow = (event) => {
-    return (
-      <tr
-        key={event.uid}
-        className='test--event-list__row'
-        onClick={this.handleRowClick(event.uid)}>
-        <td>{event.title}</td>
-        <td>{event.where}</td>
-        <td>{event.month}</td>
-      </tr>
-    )
-  };
-
-  handleRowClick = (uid) => () => {
+  handleRowClick = (rowData) => {
     const { selectEvent } = this.props;
-    selectEvent && selectEvent(uid)
+    selectEvent && selectEvent(rowData.uid)
   }
 }
 
