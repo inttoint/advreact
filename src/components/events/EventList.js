@@ -31,7 +31,7 @@ export class EventList extends Component {
 
   getRow(event) {
     return (
-      <tr key={event.uid}>
+      <tr key={event.uid} className='test--event-list__row'>
         <td>{event.title}</td>
         <td>{event.where}</td>
         <td>{event.month}</td>
