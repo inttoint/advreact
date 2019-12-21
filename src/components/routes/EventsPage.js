@@ -1,11 +1,11 @@
 import React from "react";
-import EventList from "../events/EventList";
+import VirtualizedEventList from "../events/VirtualizedEventList";
 
 const EventsPage = () => {
   return (
     <div>
       <h2>Events Page</h2>
-      <EventList />
+      <VirtualizedEventList />
     </div>
   );
 };

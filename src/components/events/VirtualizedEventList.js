@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { eventListSelector, moduleName, fetchAll, selectEvent } from "../../ducks/events";
-import Loader from '../common/Loader'
+import Loader from '../common/Loader';
+import { Table, Column } from 'react-virtualized';
+import 'react-virtualized/styles.css'
 
 export class EventList extends Component {
 
@@ -10,20 +12,39 @@ export class EventList extends Component {
   }
 
   render() {
-    const { loading } = this.props;
+    const { loading, events } = this.props;
 
     if (loading) return <Loader />;
 
     return (
-      <div>
-        <table>
-          <tbody>
-          { this.getRows() }
-          </tbody>
-        </table>
-      </div>
+      <Table
+        rowCount={events.length}
+        rowGetter={this.rowGetter}
+        overscanRowCount={5}
+        rowHeight={40}
+        headerHeight={50}
+        width={700}
+        height={300}
+      >
+        <Column
+          label="title"
+          width={300}
+          dataKey="title" />
+        <Column
+          label="where"
+          width={250}
+          dataKey="where" />
+        <Column
+          label="month"
+          width={150}
+          dataKey="month" />
+      </Table>
     );
   }
+
+  rowGetter = ({ index }) => {
+    return this.props.events[index];
+  };
 
   getRows() {
     return this.props.events.map(this.getRow);
