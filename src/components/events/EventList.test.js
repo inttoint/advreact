@@ -58,7 +58,7 @@ describe('EventList container', () => {
       const container = mount(<EventList { ...nextProps } />);
       container.find('.test--event-list__row').first().simulate('click');
 
-      // expect(selected).toEqual(testEvents[0].uid);
+      expect(selected).toEqual(testEvents[0].uid);
     });
   });
 
