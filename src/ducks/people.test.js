@@ -1,27 +1,53 @@
-import { addPersonSaga, ADD_PERSON_REQUEST, ADD_PERSON } from "./people";
-import { call, put } from 'redux-saga/effects';
-import { generateId } from "./utils";
+import {
+  addPersonSaga,
+  fetchPeopleSaga,
+  ADD_PERSON_REQUEST,
+  ADD_PERSON,
+  ADD_PERSON_SUCCESS,
+  FETCH_PEOPLE_REQUEST, FETCH_PEOPLE_SUCCESS
+} from "./people";
+import {call, put, take} from 'redux-saga/effects';
+import {reset} from "redux-form";
+import firebase from "firebase";
 
-it ('should dispatch person with generated id', () => {
-  const person = {
-    firstName: 'Tester',
-    lastName: 'Testerov',
-    email: 'test@test.test'
-  };
+describe('people saga', () => {
+  it('should dispatch person with generated id', () => {
+    const ref = firebase.database().ref('people');
+    const person = {
+      firstName: 'Tester',
+      lastName: 'Testerov',
+      email: 'test@test.test'
+    };
+    const requestAction = { type: ADD_PERSON_REQUEST, payload: person };
+    const saga = addPersonSaga(requestAction);
 
-  const saga = addPersonSaga({
-    type: ADD_PERSON_REQUEST,
-    payload: person
+    expect(saga.next().value).toEqual(call([ref, ref.push], requestAction.payload));
+    expect(saga.next().value).toEqual(put({ type: ADD_PERSON_SUCCESS }));
+    expect(saga.next().value).toEqual(put(reset('newPerson')));
+    expect(saga.next().done).toBeTruthy();
   });
 
-  expect(saga.next().value).toEqual(call(generateId));
+  it('should fetch people from firebase', () => {
+    const ref = firebase.database().ref('people');
+    const saga = fetchPeopleSaga();
+    expect(saga.next().value).toEqual(take(FETCH_PEOPLE_REQUEST));
 
-  const id = generateId();
+    expect(saga.next().value).toEqual(call([ref, ref.once], 'value'));
 
-  expect(saga.next(id).value).toEqual(put({
-    type: ADD_PERSON,
-    payload: {
-      person: { id, ...person }
-    }
-  }));
+    // expect(saga.next().value).toEqual(put({
+    //   type: FETCH_PEOPLE_SUCCESS
+    // }))
+
+  });
 });
+
+// describe('people reducer', () => {
+//
+//   it('should return the initial state');
+//
+//   it('should handle the ADD_PERSON_REQUEST action');
+//
+//   it('should handle the ADD_PERSON_SUCCESS action');
+//
+//   it('should handle the FETCH_PEOPLE_SUCCESS action');
+// });

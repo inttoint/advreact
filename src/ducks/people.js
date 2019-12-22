@@ -69,21 +69,16 @@ export function fetchPeople() {
 }
 
 export const addPersonSaga = function * (action) {
-  const id = yield call(generateId);
-
   const ref = firebase.database().ref('people');
   yield call([ref, ref.push], action.payload);
 
   yield put({
-    type: ADD_PERSON_SUCCESS,
-    payload: {
-      person: { id, ...action.payload }
-    }
+    type: ADD_PERSON_SUCCESS
   });
   yield put(reset('newPerson')); /* ToDo: Вынести название формы */
 };
 
-export const fetchPersonSaga = function * () {
+export const fetchPeopleSaga = function * () {
   while (true) {
     yield take(FETCH_PEOPLE_REQUEST);
 
@@ -97,6 +92,6 @@ export const fetchPersonSaga = function * () {
 export const saga = function * () {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
-    fetchPersonSaga()
+    fetchPeopleSaga()
   ]);
 };
