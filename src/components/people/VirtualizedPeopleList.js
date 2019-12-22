@@ -10,19 +10,10 @@ class VirtualizedPeopleList extends Component {
     this.props.fetchPeople();
   }
 
-  // ToDo: надо обновлять список людей
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    // console.log()
-    if (prevProps.people.length !== this.props.people.length) {
-      this.props.fetchPeople();
-      return true;
-    }
-    return false;
-  }
+  // ToDo: повторный рендеринг таблицы после добавления people
 
   render() {
     const { people, loading } = this.props;
-
     if (loading) return <Loader />;
 
     return (
