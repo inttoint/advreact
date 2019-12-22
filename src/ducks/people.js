@@ -35,7 +35,6 @@ export default function reducer(state = new ReducerState(), action) {
       return state.set('loading', true);
 
     case ADD_PERSON_SUCCESS:
-      const person = new PersonRecord(payload.person);
       return state
         .set('loading', false);
 

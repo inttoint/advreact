@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { fetchPeople, moduleName, peopleListSelector } from '../../ducks/people'
 import { connect } from 'react-redux';
-import { List } from 'react-virtualized';
+import { Table, Column } from 'react-virtualized';
 import 'react-virtualized/styles.css'
 import Loader from "../common/Loader";
 
@@ -11,47 +11,37 @@ class VirtualizedPeopleList extends Component {
   }
 
   // ToDo: надо обновлять список людей
-  // componentDidUpdate(prevProps, prevState, snapshot) {
-  //   if (prevProps.people.length !== this.props.people.length) {
-  //     this.props.fetchPeople();
-  //   }
-  // }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // console.log()
+    if (prevProps.people.length !== this.props.people.length) {
+      this.props.fetchPeople();
+      return true;
+    }
+    return false;
+  }
 
   render() {
     const { people, loading } = this.props;
 
-    // console.log('-->', people.length);
     if (loading) return <Loader />;
 
     return (
-      <div>
-        <h2>People List</h2>
-          <List
-            ref="List"
-            height={300}
-            width={700}
-            rowHeight={50}
-            rowCount={people.length}
-            rowRenderer={this.rowRenderer}
-          />
-      </div>
+        <Table
+          rowHeight={50}
+          width={600}
+          height={300}
+          rowGetter={this.rowGetter}
+          rowCount={people.length}
+          headerHeight={50} >
+
+          <Column label="firstName" width={200} dataKey="firstName" />
+          <Column label="lastName" width={200} dataKey="lastName" />
+          <Column label="email" width={200} dataKey="email" />
+        </Table>
     );
   }
 
-  rowRenderer = ({ index, key, style }) => {
-    const { people } = this.props;
-
-    return (
-     <div key={key} className="row" style={style} >
-       <div className="content">
-         <div>
-           <span>{`${people[index].firstName} ${people[index].lastName}`}</span>
-         </div>
-         <div>{ people[index].email }</div>
-       </div>
-     </div>
-    );
-  }
+  rowGetter = ({ index }) => (this.props.people[index]);
 }
 
 export default connect(state => ({
