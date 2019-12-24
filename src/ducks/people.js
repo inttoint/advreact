@@ -1,5 +1,5 @@
 import { appName } from  '../config';
-import { List, Record} from 'immutable';
+import { OrderedMap, Record} from 'immutable';
 import {fbDataToEntities} from "./utils";
 import { put, call, takeEvery, take, all } from 'redux-saga/effects';
 import { reset } from 'redux-form';
@@ -7,7 +7,7 @@ import { createSelector } from 'reselect';
 import firebase from "firebase";
 
 export const ReducerState = Record({
-  entities: List(),
+  entities: new OrderedMap({}),
   loading: false,
   loaded: false
 });
@@ -36,7 +36,8 @@ export default function reducer(state = new ReducerState(), action) {
 
     case ADD_PERSON_SUCCESS:
       return state
-        .set('loading', false);
+        .set('loading', false)
+        .setIn(['entities', payload.uid], new PersonRecord(payload));
 
     case FETCH_PEOPLE_SUCCESS:
       return state
@@ -69,11 +70,13 @@ export function fetchPeople() {
 }
 
 export const addPersonSaga = function * (action) {
-  const ref = firebase.database().ref('people');
-  yield call([ref, ref.push], action.payload);
+  const { payload } = action;
+  const peopleRef = firebase.database().ref('people');
+  const ref = yield call([peopleRef, peopleRef.push], payload);
 
   yield put({
-    type: ADD_PERSON_SUCCESS
+    type: ADD_PERSON_SUCCESS,
+    payload: { ...payload, uid: ref.key }
   });
   yield put(reset('newPerson')); /* ToDo: Вынести название формы */
 };

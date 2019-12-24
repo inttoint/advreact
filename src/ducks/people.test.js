@@ -8,21 +8,25 @@ import reducer, {
 import {call, put, take} from 'redux-saga/effects';
 import {reset} from "redux-form";
 import firebase from "firebase";
-import {fbDataToEntities} from "./utils";
+import {fbDataToEntities, generateId} from "./utils";
+
+const person = {
+  firstName: 'Tester',
+  lastName: 'Testerov',
+  email: 'test@test.test'
+};
 
 describe('people saga', () => {
-  it('should dispatch person with generated id', () => {
-    const ref = firebase.database().ref('people');
-    const person = {
-      firstName: 'Tester',
-      lastName: 'Testerov',
-      email: 'test@test.test'
-    };
+  it('should add person to firebase and entities', () => {
+    const peopleRef = firebase.database().ref('people');
     const requestAction = { type: ADD_PERSON_REQUEST, payload: person };
     const saga = addPersonSaga(requestAction);
 
-    expect(saga.next().value).toEqual(call([ref, ref.push], requestAction.payload));
-    expect(saga.next().value).toEqual(put({ type: ADD_PERSON_SUCCESS }));
+    expect(saga.next().value).toEqual(call([peopleRef, peopleRef.push], requestAction.payload));
+
+    const key = generateId();
+
+    expect(saga.next({ key }).value).toEqual(put({ type: ADD_PERSON_SUCCESS, payload: {...person, uid: key} }));
     expect(saga.next().value).toEqual(put(reset('newPerson')));
     expect(saga.next().done).toBeTruthy();
   });
@@ -45,7 +49,6 @@ describe('people saga', () => {
 });
 
 describe('people reducer', () => {
-
   const initialState = new ReducerState();
 
   it('should return the initial state', () => {
@@ -67,9 +70,10 @@ describe('people reducer', () => {
   });
 
   it('should handle the ADD_PERSON_SUCCESS action', () => {
-    const action = { type: ADD_PERSON_SUCCESS };
-    const expectedState = new ReducerState({ loading: false });
-
+    const uid = generateId();
+    const action = { type: ADD_PERSON_SUCCESS, payload: {...person, uid }};
+    const expectedState = new ReducerState({ loading: false})
+      .setIn(['entities', uid], new PersonRecord(action.payload));
     expect(reducer(initialState, action)).toEqual(expectedState);
   });
 
