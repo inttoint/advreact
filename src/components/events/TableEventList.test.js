@@ -32,7 +32,7 @@ describe('TableEventList container', () => {
       const nextProps = { ...props, loading: true };
       const container = shallow(<TableEventList {...nextProps} />);
 
-      expect(container.contains(<Loader />));
+      expect(container.contains(<Loader />)).toBeTruthy();
     });
   });
 

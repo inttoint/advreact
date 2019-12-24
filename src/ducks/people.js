@@ -1,18 +1,18 @@
 import { appName } from  '../config';
 import { List, Record} from 'immutable';
-import {fbDataToEntities, generateId} from "./utils";
+import {fbDataToEntities} from "./utils";
 import { put, call, takeEvery, take, all } from 'redux-saga/effects';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
 
-const ReducerState = Record({
+export const ReducerState = Record({
   entities: List(),
   loading: false,
   loaded: false
 });
 
-const PersonRecord = Record({
+export const PersonRecord = Record({
   uid: null,
   firstName: null,
   lastName: null,
@@ -84,8 +84,8 @@ export const fetchPeopleSaga = function * () {
 
     const ref = firebase.database().ref('people');
     const data = yield call([ref, ref.once], 'value');
-
-    yield put({ type: FETCH_PEOPLE_SUCCESS, payload: data.val() });
+    const peopleList = yield call([data, data.val]);
+    yield put({ type: FETCH_PEOPLE_SUCCESS, payload: peopleList });
   }
 };
 

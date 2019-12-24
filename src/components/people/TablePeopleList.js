@@ -5,7 +5,7 @@ import { Table, Column } from 'react-virtualized';
 import 'react-virtualized/styles.css'
 import Loader from "../common/Loader";
 
-class VirtualizedPeopleList extends Component {
+export class TablePeopleList extends Component {
   componentDidMount() {
     this.props.fetchPeople();
   }
@@ -21,21 +21,20 @@ class VirtualizedPeopleList extends Component {
           rowHeight={50}
           width={600}
           height={300}
-          rowGetter={this.rowGetter}
+          rowGetter={({index}) => people[index]}
           rowCount={people.length}
-          headerHeight={50} >
+          headerHeight={50}
+          rowClassName="test--people-list__row" >
 
-          <Column label="firstName" width={200} dataKey="firstName" />
-          <Column label="lastName" width={200} dataKey="lastName" />
-          <Column label="email" width={200} dataKey="email" />
+          <Column label="FirstName" width={200} dataKey="firstName" />
+          <Column label="LastName" width={200} dataKey="lastName" />
+          <Column label="Email" width={200} dataKey="email" />
         </Table>
     );
   }
-
-  rowGetter = ({ index }) => (this.props.people[index]);
 }
 
 export default connect(state => ({
   people: peopleListSelector(state),
   loading: state[moduleName].loading
-}), { fetchPeople })(VirtualizedPeopleList);
+}), { fetchPeople })(TablePeopleList);
