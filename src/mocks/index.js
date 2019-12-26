@@ -3,7 +3,6 @@ import firebase from 'firebase';
 
 export function saveEventsToFB() {
   const eventsRef = firebase.database().ref('/events');
-  console.log(eventsRef)
   conferences.forEach(conference  => eventsRef.push(conference));
 }
 

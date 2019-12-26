@@ -107,7 +107,6 @@ export const fetchLazySaga = function * () {
     yield put({ type: FETCH_LAZY_START });
 
     const lastEvent = state.entities.last();
-    console.log('-->', state.entities.size);
     const ref = firebase.database().ref('events')
       .orderByKey()
       .limitToFirst(10)
