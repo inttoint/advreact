@@ -2,12 +2,12 @@ import React from "react";
 import { shallow, mount } from 'enzyme';
 import people from '../../mocks/people';
 import {PersonRecord} from "../../ducks/people";
-import {TablePeopleList} from "./TablePeopleList";
+import {PeopleTable} from "./PeopleTable";
 import Loader from "../common/Loader";
 
 const testPeople = people.map(PersonRecord);
 
-describe('TablePeopleList container', () => {
+describe('PeopleTable container', () => {
   const props = {
     people: [],
     loading: false,
@@ -15,32 +15,32 @@ describe('TablePeopleList container', () => {
     fetchPeople: () => {}
   };
 
-  describe('TablePeopleList container initial', () => {
+  describe('PeopleTable container initial', () => {
     const mockFetchPeople = jest.fn();
     const nextProps = { ...props, fetchPeople: mockFetchPeople }
 
-    shallow(<TablePeopleList { ...nextProps } />);
+    shallow(<PeopleTable { ...nextProps } />);
 
     it('should request fetch data', () => {
       expect(mockFetchPeople).toHaveBeenCalled();
     })
   });
 
-  describe('TablePeopleList container loading', () => {
+  describe('PeopleTable container loading', () => {
     it('should render loading component', () => {
       const nextProps = { ...props, loading: true };
-      const container = shallow(<TablePeopleList {...nextProps} />);
+      const container = shallow(<PeopleTable {...nextProps} />);
 
       expect(container.contains(<Loader />)).toBeTruthy();
     });
   });
 
-  describe('TablePeopleList render people', () => {
+  describe('PeopleTable render people', () => {
 
     it('should render people from short list', () => {
       const shortList = testPeople.slice(0, 5);
       const nextProps = { ...props, people: shortList };
-      const container = mount(<TablePeopleList { ...nextProps } />);
+      const container = mount(<PeopleTable { ...nextProps } />);
       const rows = container.find('.test--people-list__row');
 
       expect(rows.length - 1).toEqual(shortList.length);
@@ -48,7 +48,7 @@ describe('TablePeopleList container', () => {
 
     it('should render people from long list', () => {
       const nextProps = { ...props, people: testPeople };
-      const container = mount(<TablePeopleList { ...nextProps } />);
+      const container = mount(<PeopleTable { ...nextProps } />);
       const rows = container.find('.test--people-list__row');
 
       expect(rows.length - 1).toEqual(15);

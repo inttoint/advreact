@@ -5,7 +5,7 @@ import { Table, Column } from 'react-virtualized';
 import 'react-virtualized/styles.css'
 import Loader from "../common/Loader";
 
-export class TablePeopleList extends Component {
+export class PeopleTable extends Component {
   componentDidMount() {
     this.props.fetchPeople();
   }
@@ -37,4 +37,4 @@ export class TablePeopleList extends Component {
 export default connect(state => ({
   people: peopleListSelector(state),
   loading: state[moduleName].loading
-}), { fetchPeople })(TablePeopleList);
+}), { fetchPeople })(PeopleTable);

@@ -1,18 +1,21 @@
 import React from "react";
 import NewPersonForm from "../people/NewPersonForm";
 import { connect } from 'react-redux';
-import { addPerson } from '../../ducks/people';
-import VirtualizedPeopleList from "../people/TablePeopleList";
+import { addPerson, moduleName } from '../../ducks/people';
+import PeopleTable from "../people/PeopleTable";
+import Loader from "../common/Loader";
 
 const PersonPage = (props) => {
-  const { addPerson } = props;
+  const { loading, addPerson } = props;
   return (
     <div>
-      <NewPersonForm onSubmit={addPerson} />
+      <PeopleTable />
       <hr />
-      <VirtualizedPeopleList />
+      { loading ? <Loader /> : <NewPersonForm onSubmit={addPerson} /> }
     </div>
   );
 };
 
-export default connect(null, { addPerson })(PersonPage);
+export default connect(state => ({
+  loading: state[moduleName].loading
+}), { addPerson })(PersonPage);
