@@ -3,7 +3,7 @@ import reducer, {
   fetchPeopleSaga,
   ADD_PERSON_REQUEST,
   ADD_PERSON_SUCCESS,
-  FETCH_PEOPLE_REQUEST, FETCH_PEOPLE_SUCCESS, ReducerState, PersonRecord,
+  FETCH_PEOPLE_REQUEST, FETCH_PEOPLE_SUCCESS, ReducerState, PersonRecord, ADD_PERSON_ERROR, FETCH_PEOPLE_ERROR,
 } from "./people";
 import {call, put, take} from 'redux-saga/effects';
 import {reset} from "redux-form";
@@ -17,8 +17,9 @@ const person = {
 };
 
 describe('people saga', () => {
+  const peopleRef = firebase.database().ref('people');
+
   it('should add person to firebase and entities', () => {
-    const peopleRef = firebase.database().ref('people');
     const requestAction = { type: ADD_PERSON_REQUEST, payload: person };
     const saga = addPersonSaga(requestAction);
 
@@ -32,19 +33,43 @@ describe('people saga', () => {
   });
 
   it('should fetch people from firebase', () => {
-    const ref = firebase.database().ref('people');
     const data = { val: () => {} };
     const peopleList = {};
     const saga = fetchPeopleSaga();
 
     expect(saga.next().value).toEqual(take(FETCH_PEOPLE_REQUEST));
-    expect(saga.next().value).toEqual(call([ref, ref.once], 'value'));
+    expect(saga.next().value).toEqual(call([peopleRef, peopleRef.once], 'value'));
 
     expect(saga.next(data).value).toEqual(call([data, data.val]));
     expect(saga.next(peopleList).value).toEqual(put({
       type: FETCH_PEOPLE_SUCCESS,
       payload: peopleList
     }))
+  });
+
+  describe('Errors', () => {
+    const error = new Error('Wow! Something went wrong!');
+
+    it('should catch error in addPersonSaga', () => {
+      const requestAction = { type: ADD_PERSON_REQUEST, payload: person };
+      const saga = addPersonSaga(requestAction);
+
+      saga.next();
+      expect(saga.throw(error).value).toEqual(put({
+        type: ADD_PERSON_ERROR,
+        error
+      }));
+    });
+
+    it('should catch error in fetchPeopleSaga', () => {
+      const saga = fetchPeopleSaga();
+
+      saga.next();
+      expect(saga.throw(error).value).toEqual(put({
+        type: FETCH_PEOPLE_ERROR,
+        error
+      }));
+    });
   });
 });
 
@@ -84,6 +109,30 @@ describe('people reducer', () => {
       loading: false,
       loaded: true,
       entities: fbDataToEntities(peopleList, PersonRecord)
+    });
+
+    expect(reducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle the ADD_PERSON_ERROR action', () => {
+    const error = new Error('Oops! Something went wrong!');
+    const action = { type: ADD_PERSON_ERROR, payload: { error } };
+
+    const expectedState = new ReducerState({
+      loading: false,
+      error
+    });
+
+    expect(reducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle the FETCH_PEOPLE_ERROR action', () => {
+    const error = new Error('Oops! Something went wrong!');
+    const action = { type: FETCH_PEOPLE_ERROR, payload: { error } };
+
+    const expectedState = new ReducerState({
+      loading: false,
+      error
     });
 
     expect(reducer(initialState, action)).toEqual(expectedState);
