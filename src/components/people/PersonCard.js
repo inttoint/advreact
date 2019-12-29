@@ -8,9 +8,9 @@ const PeopleCard = (props) => {
   const draggStyle = {
     backgroundColor: isDragging ? 'gray' : 'white'
   };
-  return connectDragSource(
+  return (
     <div style={{width: 200, height: 100, ...draggStyle, ...style}}>
-      <h3>{firstName}&nbsp;{lastName}</h3>
+      {connectDragSource(<h3>{firstName}&nbsp;{lastName}</h3>)}
       <p>{email}</p>
     </div>
   );
