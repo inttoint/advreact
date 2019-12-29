@@ -8,7 +8,7 @@ const SelectedEvents = (props) => {
   const { events } = props;
   return (
     <div>
-      {props.events.map(event => <SelectedEventCard event={event} key={event.uid}/>)}
+      {events.map(event => <SelectedEventCard event={event} key={event.uid}/>)}
     </div>
   );
 };
