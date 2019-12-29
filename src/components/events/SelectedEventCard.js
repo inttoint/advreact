@@ -1,5 +1,7 @@
 import React from "react";
 import { DropTarget } from 'react-dnd';
+import {connect} from "react-redux";
+import {addEventToPerson} from "../../ducks/people";
 
 const SelectedEventCard = (props) => {
   const { connectDropTarget, canDrop, hovered } = props;
@@ -22,7 +24,7 @@ const spec = {
     const personUid = monitor.getItem().uid;
     const eventUid = props.event.uid;
 
-    console.log(`--> person: ${personUid} event:${eventUid}`);
+    props.addEventToPerson(eventUid, personUid);
 
     return { eventUid };
   }
@@ -34,4 +36,4 @@ const collect = (connect, monitor) => ({
   hovered: monitor.isOver()
 });
 
-export default DropTarget(['person'], spec, collect)(SelectedEventCard);
+export default connect(null, { addEventToPerson })(DropTarget(['person'], spec, collect)(SelectedEventCard));

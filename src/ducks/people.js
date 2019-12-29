@@ -28,6 +28,8 @@ export const ADD_PERSON_ERROR = `${prefix}/ADD_PERSON_ERROR`;
 export const FETCH_PEOPLE_REQUEST = `${prefix}/FETCH_PEOPLE_REQUEST`;
 export const FETCH_PEOPLE_SUCCESS = `${prefix}/FETCH_PEOPLE_SUCCESS`;
 export const FETCH_PEOPLE_ERROR = `${prefix}/FETCH_PEOPLE_ERROR`;
+export const ADD_EVENT_SUCCESS = `${prefix}/ADD_EVENT_SUCCESS`;
+export const ADD_EVENT_REQUEST = `${prefix}/ADD_EVENT_REQUEST`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
@@ -77,6 +79,13 @@ export function fetchPeople() {
   }
 }
 
+export function addEventToPerson(eventUid, personUid) {
+  return {
+    type: ADD_EVENT_REQUEST,
+    payload: { eventUid, personUid }
+  };
+}
+
 export const addPersonSaga = function * (action) {
   try {
     const {payload} = action;
@@ -107,9 +116,14 @@ export const fetchPeopleSaga = function * () {
   }
 };
 
+export const addEventSaga = function * (action) {
+
+};
+
 export const saga = function * () {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
-    fetchPeopleSaga()
+    fetchPeopleSaga(),
+    takeEvery(ADD_EVENT_REQUEST, addEventSaga)
   ]);
 };
