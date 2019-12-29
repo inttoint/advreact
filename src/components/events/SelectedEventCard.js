@@ -1,13 +1,16 @@
 import React from "react";
 import { DropTarget } from 'react-dnd';
-import {useDragSourceMonitor} from "react-dnd/lib/hooks/internal/drag";
 
 const SelectedEventCard = (props) => {
-  const { connectDropTarget } = props;
+  const { connectDropTarget, canDrop, hovered } = props;
   const { title, when, where } = props.event;
 
+  const dropStyle = {
+    border: `2px solid ${canDrop ? 'green' : 'white'}`,
+    backgroundColor: hovered ? 'gray' : 'white'
+  };
   return connectDropTarget(
-    <div>
+    <div style={dropStyle}>
       <h3>{title}</h3>
       <p>{where}, {when}</p>
     </div>
@@ -24,7 +27,9 @@ const spec = {
 };
 
 const collect = (connect, monitor) => ({
-  connectDropTarget: connect.dropTarget()
+  connectDropTarget: connect.dropTarget(),
+  canDrop: monitor.canDrop(),
+  hovered: monitor.isOver()
 });
 
 export default DropTarget(['person'], spec, collect)(SelectedEventCard);
