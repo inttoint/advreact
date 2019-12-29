@@ -1,7 +1,7 @@
 import { appName } from  '../config';
 import { OrderedMap, Record} from 'immutable';
 import {fbDataToEntities} from "./utils";
-import { put, call, takeEvery, take, all } from 'redux-saga/effects';
+import { put, call, takeEvery, take, all, select } from 'redux-saga/effects';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
@@ -17,7 +17,8 @@ export const PersonRecord = Record({
   uid: null,
   firstName: null,
   lastName: null,
-  email: null
+  email: null,
+  events: []
 });
 
 export const moduleName = 'people';
@@ -37,6 +38,7 @@ export default function reducer(state = new ReducerState(), action) {
   switch (type) {
     case ADD_PERSON_REQUEST:
     case FETCH_PEOPLE_REQUEST:
+    case ADD_EVENT_REQUEST:
       return state.set('loading', true);
 
     case ADD_PERSON_SUCCESS:
@@ -49,6 +51,9 @@ export default function reducer(state = new ReducerState(), action) {
         .set('loading', false)
         .set('loaded', true)
         .set('entities', fbDataToEntities(payload, PersonRecord));
+
+    case ADD_EVENT_SUCCESS:
+      return state.setIn(['entities', payload.personUid, 'events'], payload.events);
 
     case ADD_PERSON_ERROR:
     case FETCH_PEOPLE_ERROR:
@@ -117,7 +122,23 @@ export const fetchPeopleSaga = function * () {
 };
 
 export const addEventSaga = function * (action) {
+  const { eventUid, personUid } = action.payload;
 
+  const eventRef = firebase.database().ref(`people/${personUid}/events`);
+  const state = yield select(stateSelector);
+  const events = state.getIn(['entities', personUid, 'events']).concat(eventUid);
+  try {
+    yield call([eventRef, eventRef.set], events);
+    yield put({
+      type: ADD_EVENT_SUCCESS,
+      payload: {
+        personUid,
+        events
+      }
+    });
+  } catch (_) {
+
+  }
 };
 
 export const saga = function * () {
