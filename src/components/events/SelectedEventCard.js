@@ -23,6 +23,8 @@ const spec = {
     const eventUid = props.event.uid;
 
     console.log(`--> person: ${personUid} event:${eventUid}`);
+
+    return { eventUid };
   }
 };
 
