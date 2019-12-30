@@ -4,6 +4,7 @@ import { eventListSelector, moduleName, fetchLazy, selectEvent } from "../../duc
 import { Table, Column, InfiniteLoader } from 'react-virtualized';
 import 'react-virtualized/styles.css'
 import Trash from "./Trash";
+import TableRow from "./TableRow";
 
 export class EventList extends Component {
 
@@ -34,6 +35,7 @@ export class EventList extends Component {
               height={300}
               onRowClick={this.handleRowClick}
               onRowsRendered={onRowsRendered}
+              rowRenderer={this.rowRenderer}
             >
               <Column
                 label="title"
@@ -56,6 +58,10 @@ export class EventList extends Component {
 
   isRowLoaded = ({ index }) => {
     return index < this.props.events.length;
+  };
+
+  rowRenderer = (rowCtx) => {
+    return <TableRow {...rowCtx} />
   };
 
   loadMoreRows = () => {
