@@ -12,12 +12,13 @@ class PeopleCard extends Component {
     const {
       person: { firstName, lastName, email },
       style, connectDragSource, isDragging } = this.props;
-    const draggStyle = {
+    const dragStyle = {
       backgroundColor: isDragging ? 'gray' : 'white'
     };
+
     return (
-      <div style={{width: 200, height: 100, ...draggStyle, ...style}}>
-        {connectDragSource(<h3>{firstName}&nbsp;{lastName}</h3>)}
+      <div style={{width: 200, height: 100, ...dragStyle, ...style}}>
+        {connectDragSource(<h3 style={{cursor: 'move'}}>{firstName}&nbsp;{lastName}</h3>)}
         <p>{email}</p>
       </div>
     );
