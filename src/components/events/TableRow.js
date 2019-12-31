@@ -11,7 +11,10 @@ class TableRow extends Component{
 
   render() {
    const { connectDragSource, isDragging, ...rest } = this.props;
-   const dragStyle = { color: isDragging? 'silver' : 'black' };
+   const dragStyle = {
+     color: isDragging? 'silver' : 'black',
+     cursor: 'move'
+   };
 
    return (
      <div style={dragStyle}>

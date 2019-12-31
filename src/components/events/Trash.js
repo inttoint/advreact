@@ -8,6 +8,7 @@ const Trash = (props) => {
     display: 'inline-block',
     float: 'right',
     border: "2px solid red",
+    borderRadius: '10% 10% 50% 50%',
     color: 'red'
   };
 
