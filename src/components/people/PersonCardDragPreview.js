@@ -4,7 +4,7 @@ import { personSelector } from '../../ducks/people';
 
 const PersonCardDragPreview = (props) => {
   return (
-    <div>
+    <div style={{fontWeight: 'bold', fontSize: '20px'}}>
       {props.person.email}
     </div>
   );

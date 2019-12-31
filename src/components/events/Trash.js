@@ -20,7 +20,7 @@ const Trash = (props) => {
 
 const spec = {
   drop(props, monitor) {
-    const eventUid = monitor.getItem().eventUid;
+    const eventUid = monitor.getItem().uid;
 
     console.log('-->', eventUid)
   }

@@ -65,6 +65,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName];
 export const entitiesSelector = createSelector(stateSelector, state => state.entities);
+export const idSelector = (_, props) => props.uid;
 export const eventListSelector = createSelector(entitiesSelector, entities => (
   entities.valueSeq().toArray()
 ));
@@ -73,6 +74,8 @@ export const selectionSelector = createSelector(stateSelector, state => state.se
 export const selectedEventsSelector = createSelector(entitiesSelector, selectionSelector, (entities, selection) => (
   selection.toArray().map(uid => entities.get(uid))
 ));
+
+export const eventSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id));
 
 
 export function fetchAll() {
