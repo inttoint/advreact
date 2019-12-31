@@ -1,6 +1,8 @@
 import React from "react";
+import { DropTarget } from 'react-dnd';
 
-const Trash = () => {
+const Trash = (props) => {
+  const { connectDropTarget } = props;
 
   const style = {
     display: 'inline-block',
@@ -9,11 +11,23 @@ const Trash = () => {
     color: 'red'
   };
 
-  return (
+  return connectDropTarget(
     <div style={style} >
       <h3>TRASH</h3>
     </div>
   );
 };
 
-export default Trash;
+const spec = {
+  drop(props, monitor) {
+    const eventUid = monitor.getItem().eventUid;
+
+    console.log('-->', eventUid)
+  }
+};
+
+const collect = (connect, monitor) => ({
+  connectDropTarget: connect.dropTarget()
+});
+
+export default DropTarget(['event'], spec, collect)(Trash);
