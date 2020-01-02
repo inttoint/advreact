@@ -9,3 +9,9 @@ export function fbDataToEntities(data, RecordModel = Map) {
     [uid, (new RecordModel(value)).set('uid', uid)]
   ));
 }
+
+export function entitiesToFbData(data) {
+  const dataJS = data.toJS();
+  delete dataJS.uid;
+  return dataJS;
+}

@@ -1,10 +1,11 @@
 import { appName } from  '../config';
 import { OrderedMap, Record} from 'immutable';
-import {fbDataToEntities} from "./utils";
+import {entitiesToFbData, fbDataToEntities} from "./utils";
 import { put, call, takeEvery, take, all, select } from 'redux-saga/effects';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
+import {logger} from "redux-logger/src";
 
 export const ReducerState = Record({
   entities: new OrderedMap({}),
@@ -29,8 +30,11 @@ export const ADD_PERSON_ERROR = `${prefix}/ADD_PERSON_ERROR`;
 export const FETCH_PEOPLE_REQUEST = `${prefix}/FETCH_PEOPLE_REQUEST`;
 export const FETCH_PEOPLE_SUCCESS = `${prefix}/FETCH_PEOPLE_SUCCESS`;
 export const FETCH_PEOPLE_ERROR = `${prefix}/FETCH_PEOPLE_ERROR`;
-export const ADD_EVENT_SUCCESS = `${prefix}/ADD_EVENT_SUCCESS`;
 export const ADD_EVENT_REQUEST = `${prefix}/ADD_EVENT_REQUEST`;
+export const ADD_EVENT_SUCCESS = `${prefix}/ADD_EVENT_SUCCESS`;
+export const REMOVE_EVENT_FROM_PEOPLE_REQUEST = `${prefix}/REMOVE_EVENT_FROM_PEOPLE_REQUEST`;
+export const REMOVE_EVENT_FROM_PEOPLE_SUCCESS = `${prefix}/REMOVE_EVENT_FROM_PEOPLE_SUCCESS`;
+export const REMOVE_EVENT_FROM_PEOPLE_ERROR = `${prefix}/REMOVE_EVENT_FROM_PEOPLE_ERROR`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
@@ -55,8 +59,12 @@ export default function reducer(state = new ReducerState(), action) {
     case ADD_EVENT_SUCCESS:
       return state.setIn(['entities', payload.personUid, 'events'], payload.events);
 
+    case REMOVE_EVENT_FROM_PEOPLE_SUCCESS:
+      return state.mergeIn(['entities'], payload.people);
+
     case ADD_PERSON_ERROR:
     case FETCH_PEOPLE_ERROR:
+    case REMOVE_EVENT_FROM_PEOPLE_ERROR:
       return state.set('loading', false)
         .set('error', payload.error);
 
@@ -72,6 +80,11 @@ export const peopleListSelector = createSelector(entitiesSelector, entities => (
   entities.valueSeq().toArray()
 ));
 export const personSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id));
+
+export const peopleWithEventSelector = (id) => createSelector(entitiesSelector, (entities) => {
+  return entities.filter((value) => value.get('events').includes(id))
+
+});
 
 export function addPerson(person) {
   return {
@@ -90,6 +103,13 @@ export function addEventToPerson(eventUid, personUid) {
   return {
     type: ADD_EVENT_REQUEST,
     payload: { eventUid, personUid }
+  };
+}
+
+export function removeEventFromPeople(uid) {
+  return {
+    type: REMOVE_EVENT_FROM_PEOPLE_REQUEST,
+    payload: { uid }
   };
 }
 
@@ -143,10 +163,40 @@ export const addEventSaga = function * (action) {
   }
 };
 
+export const removeEventFromPeopleSaga = function * (action) {
+  const { uid } = action.payload;
+
+  const peopleWithEvent = yield select(peopleWithEventSelector(uid));
+  const updatedPeople = peopleWithEvent.map(person => person.update('events', events => events.filter(value => value !== uid)));
+
+  try {
+    for (let [key, person] of updatedPeople) {
+      const peopleRef = firebase.database().ref(`/people/${key}`);
+      const res = yield call(entitiesToFbData, person);
+      yield call([peopleRef, peopleRef.update], res);
+    }
+
+    yield put({
+      type: REMOVE_EVENT_FROM_PEOPLE_SUCCESS,
+      payload: {
+        people: updatedPeople
+      }
+    });
+
+  } catch (error) {
+    yield put({
+      type: REMOVE_EVENT_FROM_PEOPLE_ERROR,
+      error
+    });
+  }
+
+};
+
 export const saga = function * () {
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
     fetchPeopleSaga(),
-    takeEvery(ADD_EVENT_REQUEST, addEventSaga)
+    takeEvery(ADD_EVENT_REQUEST, addEventSaga),
+    takeEvery(REMOVE_EVENT_FROM_PEOPLE_REQUEST, removeEventFromPeopleSaga)
   ]);
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { DropTarget } from 'react-dnd';
 import { removeEvent } from "../../ducks/events";
+import { removeEventFromPeople } from '../../ducks/people';
 import { connect } from "react-redux";
 
 const Trash = (props) => {
@@ -26,6 +27,7 @@ const Trash = (props) => {
 const spec = {
   drop(props, monitor) {
     const eventUid = monitor.getItem().uid;
+    props.removeEventFromPeople(eventUid);
     props.removeEvent(eventUid);
   }
 };
@@ -36,4 +38,4 @@ const collect = (connect, monitor) => ({
   hovered: monitor.isOver()
 });
 
-export default connect(null, { removeEvent })(DropTarget(['event'], spec, collect)(Trash));
+export default connect(null, { removeEvent, removeEventFromPeople })(DropTarget(['event'], spec, collect)(Trash));
