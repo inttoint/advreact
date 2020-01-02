@@ -7,6 +7,7 @@ import PersonPage from "./routes/PersonPage";
 import EventsPage from "./routes/EventsPage";
 import { connect } from "react-redux";
 import { moduleName, signOut } from  '../ducks/auth'
+import CustomDragLayer from "./CustomDragLayer";
 
 
 const Root = (props) => {
@@ -21,6 +22,7 @@ const Root = (props) => {
       <Route path="/auth" component={AuthPage}/>
       <Route path="/people" component={PersonPage} />
       <Route path="/events" component={EventsPage} />
+      <CustomDragLayer />
     </div>
   );
 };
