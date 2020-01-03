@@ -5,7 +5,6 @@ import { put, call, takeEvery, take, all, select } from 'redux-saga/effects';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
-import {logger} from "redux-logger/src";
 
 export const ReducerState = Record({
   entities: new OrderedMap({}),

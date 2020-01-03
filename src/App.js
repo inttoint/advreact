@@ -13,11 +13,11 @@ import './mocks'
 function App() {
   return (
     <Provider store={store}>
-      <ConnectedRouter history={history}>
-        <DndProvider backend={HTML5Backend} >
+      <DndProvider backend={HTML5Backend} >
+        <ConnectedRouter history={history}>
           <Root />
-        </DndProvider>
-      </ConnectedRouter>
+        </ConnectedRouter>
+      </DndProvider>
     </Provider>
   );
 }
