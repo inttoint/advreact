@@ -1,7 +1,9 @@
 import { appName } from  '../config';
 import { OrderedMap, Record} from 'immutable';
 import {entitiesToFbData, fbDataToEntities} from "./utils";
-import { put, call, takeEvery, take, all, select, delay, cancel, cancelled, fork, spawn, race } from 'redux-saga/effects';
+import { put, call, takeEvery, take, all, select,
+  delay, cancel, cancelled, fork, spawn, race } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
@@ -214,9 +216,29 @@ export const cancellableSync = function * () {
   // yield cancel(task);
 };
 
+const createPeopleSocket = () => eventChannel(emmit => {
+  const ref = firebase.database().ref('people');
+  const callback = (data) => emmit({ data });
+  ref.on('value', callback);
+
+  return () => ref.off('value', callback);
+});
+
+export const realtimeSync = function * () {
+  const channel = yield call(createPeopleSocket);
+  while (true) {
+    const { data } = yield take(channel);
+
+    yield put({
+      type:FETCH_PEOPLE_SUCCESS,
+      payload: data.val()
+    });
+  }
+};
+
 
 export const saga = function * () {
-  yield spawn(cancellableSync);
+  yield spawn(realtimeSync);
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
     takeEvery(FETCH_PEOPLE_REQUEST, fetchPeopleSaga),
