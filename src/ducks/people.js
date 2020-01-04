@@ -207,13 +207,13 @@ export const backgroundSyncSaga = function * () {
 
 export const cancellableSync = function * () {
   yield race({
-    sync: backgroundSyncSaga(),
-    delay: delay(6000)
+    sync: realtimeSync(),
+    delay: delay(5000)
   });
 
-  // const task = yield fork(backgroundSyncSaga);
-  // yield delay(6000);
-  // yield cancel(task);
+  /*const task = yield fork(realtimeSync);
+  yield delay(6000);
+  yield cancel(task);*/
 };
 
 const createPeopleSocket = () => eventChannel(emmit => {
@@ -225,20 +225,24 @@ const createPeopleSocket = () => eventChannel(emmit => {
 });
 
 export const realtimeSync = function * () {
-  const channel = yield call(createPeopleSocket);
-  while (true) {
-    const { data } = yield take(channel);
-
-    yield put({
-      type:FETCH_PEOPLE_SUCCESS,
-      payload: data.val()
-    });
+  const chan = yield call(createPeopleSocket);
+  try {
+    while (true) {
+      const { data } = yield take(chan);
+      yield put({
+        type:FETCH_PEOPLE_SUCCESS,
+        payload: data.val()
+      });
+    }
+  } finally {
+    yield call([chan, chan.close])
+    console.log('cancelled realtime saga')
   }
 };
 
 
 export const saga = function * () {
-  yield spawn(realtimeSync);
+  yield spawn(cancellableSync);
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
     takeEvery(FETCH_PEOPLE_REQUEST, fetchPeopleSaga),
