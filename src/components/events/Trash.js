@@ -3,6 +3,7 @@ import { DropTarget } from 'react-dnd';
 import { removeEvent } from "../../ducks/events";
 import { removeEventFromPeople } from '../../ducks/people';
 import { connect } from "react-redux";
+import { Motion, spring, presets } from 'react-motion';
 
 const Trash = (props) => {
   const { connectDropTarget, highlighted, hovered } = props;
@@ -17,10 +18,21 @@ const Trash = (props) => {
     backgroundColor: hovered ? 'silver' : 'white'
   };
 
-  return connectDropTarget(
-    <div style={style} >
-      <h3>TRASH</h3>
-    </div>
+  return (
+    <Motion
+      defaultStyle={{opacity: 0}}
+      style={{opacity: spring(1, {
+          damping: presets.noWobble.damping * 3,
+          stiffness: presets.noWobble.stiffness / 10
+        })}}
+    >
+      { interpolatedStyles => connectDropTarget(
+        <div style={{...style, ...interpolatedStyles}} >
+          <h3>TRASH</h3>
+        </div>
+      )
+      }
+    </Motion>
   );
 };
 
