@@ -206,10 +206,21 @@ export const backgroundSyncSaga = function * () {
 };
 
 export const cancellableSync = function * () {
-  yield race({
-    sync: realtimeSync(),
-    delay: delay(5000)
-  });
+  let task;
+  while (true) {
+    const { payload } = yield take("@@router/LOCATION_CHANGE");
+    if (payload && payload.location.pathname.includes('people')) {
+      task = yield fork(realtimeSync);
+
+      // yield race({
+      //   sync: realtimeSync(),
+      //   delay: delay(5000)
+      // });
+
+    } else if (task) {
+      yield cancel(task);
+    }
+  }
 
   /*const task = yield fork(realtimeSync);
   yield delay(6000);
@@ -235,7 +246,7 @@ export const realtimeSync = function * () {
       });
     }
   } finally {
-    yield call([chan, chan.close])
+    yield call([chan, chan.close]);
     console.log('cancelled realtime saga')
   }
 };
