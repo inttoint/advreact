@@ -18,11 +18,16 @@ const Root = (props) => {
   return (
     <div>
       { btn }
+      <ul>
+        <li><Link to="/admin">Admin</Link></li>
+        <li><Link to="/people">People</Link></li>
+        <li><Link to="/events">Events</Link></li>
+      </ul>
+      <CustomDragLayer />
       <ProtectedRoute path="/admin" component={AdminPage}/>
       <Route path="/auth" component={AuthPage}/>
       <Route path="/people" component={PersonPage} />
       <Route path="/events" component={EventsPage} />
-      <CustomDragLayer />
     </div>
   );
 };

@@ -1,11 +1,13 @@
 import { appName } from  '../config';
 import { OrderedMap, Record} from 'immutable';
 import {entitiesToFbData, fbDataToEntities} from "./utils";
-import { put, call, takeEvery, take, all, select } from 'redux-saga/effects';
+import { put, call, takeEvery, take, all, select,
+  delay, cancel, cancelled, fork, spawn, race } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
 import { reset } from 'redux-form';
 import { createSelector } from 'reselect';
 import firebase from "firebase";
-import {logger} from "redux-logger/src";
+import {fetchAllSaga} from "./events";
 
 export const ReducerState = Record({
   entities: new OrderedMap({}),
@@ -128,19 +130,16 @@ export const addPersonSaga = function * (action) {
   }
 };
 
-export const fetchPeopleSaga = function * () {
-  while (true) {
-    try {
-      yield take(FETCH_PEOPLE_REQUEST);
-
-      const ref = firebase.database().ref('people');
-      const data = yield call([ref, ref.once], 'value');
-      const peopleList = yield call([data, data.val]);
-      yield put({type: FETCH_PEOPLE_SUCCESS, payload: peopleList});
-    } catch (error) {
-      yield put({ type: FETCH_PEOPLE_ERROR, error });
-    }
+export const fetchPeopleSaga = function * (action) {
+  try {
+    const ref = firebase.database().ref('people');
+    const data = yield call([ref, ref.once], 'value');
+    const peopleList = yield call([data, data.val]);
+    yield put({type: FETCH_PEOPLE_SUCCESS, payload: peopleList});
+  } catch (error) {
+    yield put({ type: FETCH_PEOPLE_ERROR, error });
   }
+
 };
 
 export const addEventSaga = function * (action) {
@@ -189,13 +188,75 @@ export const removeEventFromPeopleSaga = function * (action) {
       error
     });
   }
-
 };
 
+export const backgroundSyncSaga = function * () {
+  try {
+    while (true) {
+      yield call(fetchPeopleSaga);
+      yield delay(2000);
+    }
+  } catch (e) {
+    console.log('error -->', e)
+  } finally {
+    if (yield cancelled()) {
+      console.log('--> cancelled sync saga')
+    }
+  }
+};
+
+export const cancellableSync = function * () {
+  let task;
+  while (true) {
+    const { payload } = yield take("@@router/LOCATION_CHANGE");
+    if (payload && payload.location.pathname.includes('people')) {
+      task = yield fork(realtimeSync);
+
+      // yield race({
+      //   sync: realtimeSync(),
+      //   delay: delay(5000)
+      // });
+
+    } else if (task) {
+      yield cancel(task);
+    }
+  }
+
+  /*const task = yield fork(realtimeSync);
+  yield delay(6000);
+  yield cancel(task);*/
+};
+
+const createPeopleSocket = () => eventChannel(emmit => {
+  const ref = firebase.database().ref('people');
+  const callback = (data) => emmit({ data });
+  ref.on('value', callback);
+
+  return () => ref.off('value', callback);
+});
+
+export const realtimeSync = function * () {
+  const chan = yield call(createPeopleSocket);
+  try {
+    while (true) {
+      const { data } = yield take(chan);
+      yield put({
+        type:FETCH_PEOPLE_SUCCESS,
+        payload: data.val()
+      });
+    }
+  } finally {
+    yield call([chan, chan.close]);
+    console.log('cancelled realtime saga')
+  }
+};
+
+
 export const saga = function * () {
+  yield spawn(cancellableSync);
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
-    fetchPeopleSaga(),
+    takeEvery(FETCH_PEOPLE_REQUEST, fetchPeopleSaga),
     takeEvery(ADD_EVENT_REQUEST, addEventSaga),
     takeEvery(REMOVE_EVENT_FROM_PEOPLE_REQUEST, removeEventFromPeopleSaga)
   ]);
